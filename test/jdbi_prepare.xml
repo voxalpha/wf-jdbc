@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="stylesheets/workflow.xsl"?>
+<!-- Copyright (c) 2009 by NAVTEQ B.V. All Rights Reserved. All title and
+    intellectual property rights to the software shall remain with NAVTEQ B.V.
+    Any unauthorized reproduction or use will be prosecuted. -->
+
+<Workflow Name="Root_Workflow" NumThreads="1">
+
+    <Task Name="CreateSource" ProcessClass="com.navteq.cf.foundation.workflow.SQLProcess">
+        <Description></Description>
+        <TransportRef Name="sqlite"/>
+        <SQL>drop table if exists char</SQL>
+        <SQL>create table char
+            (
+             char_id integer,
+             first_name text,
+             last_name text,
+             address_id integer,
+             portrait blob
+            )
+        </SQL>
+        <SQL>drop table if exists address</SQL>
+        <SQL>create table address
+            (
+            address_id integer,
+            name text,
+            chamber_number integer
+            )
+        </SQL>
+
+        <SQL>insert into char values(1, 'Jon', 'Snow', 1, X'0123')</SQL>
+        <SQL>insert into char values(2, 'Cersei', 'Lannister', 2, X'3210')</SQL>
+        <SQL>insert into char values(3, 'Arya', 'Stark', null, X'0111')</SQL>
+        <SQL>insert into address values(1, 'Winterfell', 23)</SQL>
+        <SQL>insert into address values(2, 'Kings Landing', 1)</SQL>
+    </Task>
+
+    <Task Name="CreateTarget" ProcessClass="com.navteq.cf.foundation.workflow.SQLProcess">
+       <Description></Description>
+       <TransportRef Name="ora_local"/>
+        <!--SQL>drop table if exists castless</SQL-->
+        <SQL>
+            begin
+              for i in (select 1 from user_tables where table_name = upper('castless')) loop
+                execute immediate 'drop table castless';
+              end loop;
+            end;
+        </SQL>
+        <SQL>create table castless
+            (
+            char_id integer,
+            portrait blob
+            )
+        </SQL>
+    </Task>
+</Workflow>

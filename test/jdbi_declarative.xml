@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="stylesheets/workflow.xsl"?>
+<!-- Copyright (c) 2009 by NAVTEQ B.V. All Rights Reserved. All title and
+    intellectual property rights to the software shall remain with NAVTEQ B.V.
+    Any unauthorized reproduction or use will be prosecuted. -->
+
+<Workflow Name="Root_Workflow" NumThreads="1">
+
+    <Transport Name="ora_local" Code="JDBC" Default="true">
+        <Class>com.navtech.maptools.transport.jdbc.JDBCTransport</Class>
+        <JDBCDriver>oracle.jdbc.driver.OracleDriver</JDBCDriver>
+        <ConnectionString>jdbc:oracle:thin:@localhost:1521:xe</ConnectionString>
+        <DatabaseUser>vox</DatabaseUser>
+        <DatabasePassword>1</DatabasePassword>
+    </Transport>
+
+    <Transport Name="sqlite" Code="JDBC" Default="true">
+        <Class>com.navtech.maptools.transport.jdbc.JDBCTransport</Class>
+        <JDBCDriver>org.sqlite.JDBC</JDBCDriver>
+        <ConnectionString>jdbc:sqlite:sample.sqlite</ConnectionString>
+        <DatabaseUser>no</DatabaseUser>
+        <DatabasePassword>no</DatabasePassword>
+    </Transport>
+
+    <IncludeWorkflow File="test/etc/xml/workflow/jdbi/jdbi_prepare.xml" Name="Child_Workflow_1"/>
+
+    <Task Name="ProcessChars" TerminateOnError="true" RunDefault="true"
+              ProcessClass="com.navteq.cf.foundation.workflow.test.jdbi.JdbiSampleDeclarative">
+        <Description></Description>
+        <DataAccess
+           Class="com.navteq.cf.foundation.workflow.test.jdbi.DeclarativeDAO.GOTDAOSource"
+           TransportRef="sqlite"/>
+        <DataAccess
+           Class="com.navteq.cf.foundation.workflow.test.jdbi.DeclarativeDAO.GOTDAOTarget"
+           TransportRef="ora_local"/>
+    </Task>
+
+</Workflow>
